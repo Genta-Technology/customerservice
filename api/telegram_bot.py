@@ -7,6 +7,14 @@ load_dotenv()
 
 
 def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name:str):
+    """_summary_
+
+    Args:
+        telegram_token (str): token from telegram, got from https://t.me/BotFather 
+        prompt (str): prompt engineering to user
+        genta_token (str): token from genta API
+        model_name (str): name of model
+    """
     # Replace with your actual token 
     GENTA_API = GentaAPI(token=genta_token)
     bot = telebot.TeleBot(telegram_token)
