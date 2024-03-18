@@ -28,13 +28,17 @@ def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name
         bot.reply_to(message, "Hi there, I am a simple Telegram bot. How can I help you?")
         chat_ids = [data["chat_id"] for data in user_data["data"]]
         if message.chat.id in chat_ids:
-        if not chats:
+            index_chat_id = chat_ids.index(message.chat.id)
+            chats = user_data["data"][index_chat_id]["chat_history"]
+        else: 
+            chats = [{"role": "system", "content":prompt}]
+        if len(chats) == 1:
             chats.append({"role": "user", "content": "Hi there, I am a simple Telegram bot. How can I help you?"})
-        user_data["data"].append({
-            "chat_id": message.chat.id,
-            "time_last_conversation": message.date,
-            "chat_history": chats
-        })
+            user_data["data"].append({
+                "chat_id": message.chat.id,
+                "time_last_conversation": message.date,
+                "chat_history": chats
+            })
         json.dump(user_data, open("chat_history.json", "w"))
 
     @bot.message_handler(commands=['help']) # give help to the user
