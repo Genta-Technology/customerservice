@@ -1,11 +1,11 @@
 {
-    "telegram_bot_token": "6582132410:AAFnokvBtQdXphSx6OkRj6QBDO30_zlpJg0",
-    "prompt": "hi this is an trial hehehe",
-    "data": [],
-    "bot_status": true,
-    "temperature": 0.49,
-    "max_token": 117,
-    "max_chat_size": 10,
-    "genta_token": "dc521b81-a7e2-4c46-815b-21cb6cb17596",
-    "model_selection": "OpenChat-7B"
-  }
+  "telegram_bot_token": "",
+  "prompt": "hi this is an trial hehehe",
+  "data": [],
+  "bot_status": false,
+  "temperature": 0.5,
+  "max_token": 100,
+  "max_chat_size": 10,
+  "genta_token": "",
+  "model_selection": "OpenChat-7B"
+}

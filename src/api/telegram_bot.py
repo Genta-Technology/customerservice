@@ -32,8 +32,15 @@ def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name
             chats = user_data["data"][index_chat_id]["chat_history"]
         else: 
             chats = [{"role": "system", "content":prompt}]
+            
         if len(chats) == 1:
-            chats.append({"role": "user", "content": "Hi there, I am a simple Telegram bot. How can I help you?"})
+            chats.append({"role": "assistant", "content": "Hi there, I am a simple Telegram bot. How can I help you?"})
+        
+        if message.chat.id in chat_ids:
+            index_chat_id = chat_ids.index(message.chat.id)
+            user_data["data"][index_chat_id]["time_last_conversation"] = message.date
+            user_data["data"][index_chat_id]["chat_history"] = chats
+        else:
             user_data["data"].append({
                 "chat_id": message.chat.id,
                 "time_last_conversation": message.date,
@@ -72,6 +79,7 @@ def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name
             chats = user_data["data"][index_chat_id]["chat_history"]
         else: 
             chats = [{"role": "system", "content":prompt}]
+            
         if len(chats)/2 <= user_data["max_chat_size"] and user_data["bot_status"]:
             user_response = {"role": "user", "content": message.text}
             chats.append(user_response)
