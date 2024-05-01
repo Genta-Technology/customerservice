@@ -5,6 +5,33 @@ from dotenv import load_dotenv
 import json
 # loading variables from .env file
 load_dotenv() 
+import requests
+import json
+from openai import OpenAI
+
+# this part is for RAG
+url = 'https://4dh8jbxq2gbxjs-8000.proxy.runpod.net/complete'
+headers = {
+    'accept': 'application/json',
+    'Content-Type': 'application/json'
+}
+data = {
+    "model_id": "72c7e262083b192e47449eb203dbe5aa5e6e3b7e4b492a0b8f81f761269d3332",
+    "completion_parameters": {
+        "prompt": [
+            {
+                "role": "user",
+                "content": "Anda adalah asisten AI customer service berbahasa Indonesia yang membantu menjawab pertanyaan serta menyelesaikan permasalahan yang dialami oleh user menggunakan referensi yang tersedia sebagai acuan.\n\n## CONTEXT\nTutorial Integrasi Google Form dengan Woowa Eco\n\nmasuk ke Google Formulir Anda 2. buat formulir baru\n\nbuat spreadsheet dengan memilih tab responses dan kemudian mengklik icon spreadsheet\n\nubah scriptnya, dengan cara klik menu tools >> script editor\n\nsilahkan buka api.woowa.com untuk mendapatkan scriptnya atau bisa melalui link ini\n\nedit apa yang , dan jangan edit apa yang\n\nTutorial Integrasi Woowa Eco X Zapier Dengan Google Form\n\nSilahkan buat google form anda sendiri, pastikan ada kolom untuk mengisi nomor whatsapp\n\nKlik tab '\''Responses'\'' pada google form anda, kemudian klik icon spreadsheet lalu klik '\''Create'\'' untuk membuat spreadsheet responses dari google form yang anda buat\n\nTutorial Integrasi Woowandroid X Google Form\n\nMasuk ke Google Form anda, lalu buatlah form baru\n\nKlik tab reponses lalu buat spreadsheet baru dengan cara: kemudian akan terbuka tab google spreadsheet baru di browser anda\n\n## QUESTION\nBagaimana saya dapat membuat google form di woowa?"
+            }
+        ],
+        "max_new_tokens": 2048,
+        "min_length": 8,
+        "temperature": 0.7,
+        "top_p": 0,
+        "random_seed": 0,
+        "streaming": False
+    }
+}
 
 
 def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name:str):
@@ -74,6 +101,10 @@ def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name
         user_data = json.load(open("chat_history.json", "r"))
         #print(message.chat.id)
         chat_ids = [data["chat_id"] for data in user_data["data"]]
+        client = OpenAI(
+            base_url="https://api.genta.tech",
+            api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiJDWVlEb2dvaWJyVFRBUnpHWmo3N25qdzJ3MnpwUmhJMSIsImVtYWlsIjoicmVzZWFyY2hzb2NhQGdtYWlsLmNvbSJ9.g9lSqvYx58fZsf9q36_LWC47vd1KoI6QmzQKJ9MPwqw",
+        )
         if message.chat.id in chat_ids:
             index_chat_id = chat_ids.index(message.chat.id)
             chats = user_data["data"][index_chat_id]["chat_history"]
@@ -85,12 +116,16 @@ def run_telegram_bot(telegram_token:str, prompt:str, genta_token:str, model_name
             chats.append(user_response)
             while (True):
                 try:
-                        
-                    response = GENTA_API.ChatCompletion(chat_history=chats,
-                                                        model_name=model_name,
-                                                        temperature=user_data["temperature"],
-                                                        max_new_tokens=user_data["max_token"])
-                    response_txt = response[0][0][0]['generated_text']
+                    completion = client.chat.completions.create(
+                        model="Meta-Llama-3-8B-Instruct",
+                        messages=chats,
+                        max_tokens=2048
+                    )
+                    response = completion.choices[0]
+                    #print(response)
+                    #response_txt = response.json()['text']
+                    response_txt = response.message.content
+                    print(response_txt)
                     chat = {"role": "assistant", "content": response_txt}
                     chats.append(chat)
                     bot.reply_to(message, response_txt)

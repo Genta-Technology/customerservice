@@ -48,7 +48,7 @@ def dashboard_page():
     with col1:
         model_option = st.selectbox(
                 'Select Model',
-                ('OpenChat-7B',))
+                ('OpenChat-7B','Starstreak'))
     with col2:
         start_bot_button = st.button("start bot")
         stop_bot_button = st.button("stop bot")
